@@ -1,0 +1,7 @@
+kube-score.sh:
+  enabled: true
+yamllint.sh:
+  enabled: true
+  allowEmpty: true
+  values: |
+    tags.ingress-nginx=false

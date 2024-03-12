@@ -1,0 +1,122 @@
+---
+apiVersion: delivery.ocm.software/v1alpha1
+kind: ComponentVersion
+metadata:
+  name: ocm-hello-world
+  namespace: ocm-system
+spec:
+  component: ocm.software/ocm-hello-world
+  interval: 10s
+  references:
+    expand: true
+  repository:
+    url: ghcr.io/stb1337/ocm-hello-world
+    secretRef:
+      name: pull-secret
+  version:
+    semver: "0.0.10"
+---
+apiVersion: delivery.ocm.software/v1alpha1
+kind: ComponentVersion
+metadata:
+  name: ocm-hello-world-ingress-nginx
+  namespace: ocm-system
+spec:
+  component: ocm.software/nginx-controller
+  interval: 10s
+  references:
+    expand: true
+  repository:
+    url: ghcr.io/stb1337/ocm-hello-world
+    secretRef:
+      name: pull-secret
+  version:
+    semver: "1.10.2"
+---
+# resource.yaml
+apiVersion: delivery.ocm.software/v1alpha1
+kind: Resource
+metadata:
+  name: ocm-hello-world-nginx-external-helm-chart
+  namespace: ocm-system
+spec:
+  interval: 10s
+  sourceRef:
+    apiVersion: delivery.ocm.software/v1alpha1
+    kind: ComponentVersion
+    name: ocm-hello-world-ingress-nginx
+    namespace: ocm-system
+    resourceRef:
+      name: nginx-external-helm-chart
+      version: "1.10.2"
+      extraIdentity:
+        helmChart: ingress-nginx # name of the chart
+---
+# resource.yaml
+apiVersion: delivery.ocm.software/v1alpha1
+kind: Resource
+metadata:
+  name: ocm-hello-world-nginx-file-system-tgz
+  namespace: ocm-system
+spec:
+  interval: 10s
+  sourceRef:
+    apiVersion: delivery.ocm.software/v1alpha1
+    kind: ComponentVersion
+    name: ocm-hello-world-ingress-nginx
+    namespace: ocm-system
+    resourceRef:
+      name: nginx-file-system-tgz
+      version: "1.10.2"
+      extraIdentity:
+        helmChart: ingress-nginx # name of the chart
+---
+# deployer.yaml
+apiVersion: delivery.ocm.software/v1alpha1
+kind: FluxDeployer
+metadata:
+  name: ocm-hello-world-nginx-external-helm-chart
+  namespace: ocm-system
+spec:
+  interval: 10s
+  sourceRef:
+    apiVersion: delivery.ocm.software/v1alpha1
+    kind: Resource
+    name: ocm-hello-world-nginx-external-helm-chart
+  helmReleaseTemplate:
+    chart: 
+      spec: 
+        chart: "ingress-nginx"
+        interval: 10s
+        sourceRef:
+          apiVersion: delivery.ocm.software/v1alpha1
+          kind: Resource
+          name: ocm-hello-world-nginx-external-helm-chart
+    interval: 10s
+    releaseName: "nginx-external-helm-chart"
+    targetNamespace: default    
+---
+# deployer.yaml
+apiVersion: delivery.ocm.software/v1alpha1
+kind: FluxDeployer
+metadata:
+  name: ocm-hello-world-nginx-file-system-tgz
+  namespace: ocm-system
+spec:
+  interval: 10s
+  sourceRef:
+    apiVersion: delivery.ocm.software/v1alpha1
+    kind: Resource
+    name: ocm-hello-world-nginx-file-system-tgz 
+  helmReleaseTemplate:
+    chart: 
+      spec: 
+        chart: "ingress-nginx"
+        interval: 10s
+        sourceRef:
+          apiVersion: delivery.ocm.software/v1alpha1
+          kind: Resource
+          name: ocm-hello-world-nginx-external-helm-chart
+    interval: 10s
+    releaseName: "nginx-system-tgz"
+    targetNamespace: default

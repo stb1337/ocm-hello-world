@@ -1,0 +1,174 @@
+---
+apiVersion: delivery.ocm.software/v1alpha1
+kind: ComponentVersion
+metadata:
+  name: ocm-hello-world-pod-info
+  namespace: ocm-system
+spec:
+  component: ocm.software/pod-info
+  interval: 10s
+  references:
+    expand: true
+  repository:
+    url: ghcr.io/stb1337/ocm-hello-world
+    secretRef:
+      name: pull-secret
+  version:
+    semver: "6.6.4"
+---
+# resource.yaml
+apiVersion: delivery.ocm.software/v1alpha1
+kind: Resource
+metadata:
+  name: ocm-hello-world-pod-info-external-helm-chart
+  namespace: ocm-system
+spec:
+  interval: 10s
+  sourceRef:
+    apiVersion: delivery.ocm.software/v1alpha1
+    kind: ComponentVersion
+    name: ocm-hello-world-pod-info
+    namespace: ocm-system
+    resourceRef:
+      name: pod-info-external-helm-chart
+      version: "6.6.4"
+      extraIdentity:
+        helmChart: podinfo # name of the chart
+---
+# deployer.yaml
+apiVersion: delivery.ocm.software/v1alpha1
+kind: FluxDeployer
+metadata:
+  name: ocm-hello-world-nginx-external-helm-chart
+  namespace: ocm-system
+spec:
+  interval: 10s
+  sourceRef:
+    apiVersion: delivery.ocm.software/v1alpha1
+    kind: Resource
+    name: ocm-hello-world-pod-info-external-helm-chart
+  helmReleaseTemplate:
+    chart: 
+      spec: 
+        chart: "podinfo"
+        interval: 10s
+        sourceRef:
+          apiVersion: delivery.ocm.software/v1alpha1
+          kind: Resource
+          name: ocm-hello-world-pod-info-external-helm-chart
+    values:
+      replicaCount: 3
+      image:
+        repository: ghcr.io/stb1337/ocm-hello-world/stefanprodan/podinfo
+      ui:
+        color: "#8F00FF"
+        message: "Hello from remote referenced Helm Chart"
+      ingress:
+        enabled: true
+        #className: ""
+        additionalLabels: {}
+        annotations:
+          nginx.ingress.kubernetes.io/backend-protocol: HTTP
+          dns.gardener.cloud/class: garden
+          dns.gardener.cloud/dnsnames: '*.ocm-hello-world.ketos.shoot.canary.k8s-hana.ondemand.com'
+          dns.gardener.cloud/ttl: '600'
+          # kubernetes.io/ingress.class: nginx
+          # kubernetes.io/tls-acme: "true"
+        hosts:
+          - host: podinfo-remote-ref.ocm-hello-world.ketos.shoot.canary.k8s-hana.ondemand.com        
+            paths:
+              - path: /
+                pathType: Prefix
+        tls: 
+          - hosts:
+            - podinfo-remote-ref.ocm-hello-world.ketos.shoot.canary.k8s-hana.ondemand.com
+    interval: 10s
+    releaseName: "pod-info-external-helm-chart"
+    targetNamespace: default
+---
+# resource.yaml
+apiVersion: delivery.ocm.software/v1alpha1
+kind: Resource
+metadata:
+  name: ocm-hello-world-pod-info-file-system-tar
+  namespace: ocm-system
+spec:
+  interval: 10s
+  sourceRef:
+    apiVersion: delivery.ocm.software/v1alpha1
+    kind: ComponentVersion
+    name: ocm-hello-world-pod-info
+    namespace: ocm-system
+    resourceRef:
+      name: pod-info-file-system-tar
+      version: "6.6.4"
+      extraIdentity:
+        helmChart: podinfo # name of the chart
+---
+# deployer.yaml
+apiVersion: delivery.ocm.software/v1alpha1
+kind: FluxDeployer
+metadata:
+  name: ocm-hello-world-pod-info-file-system-tar
+  namespace: ocm-system
+spec:
+  interval: 10s
+  sourceRef:
+    apiVersion: delivery.ocm.software/v1alpha1
+    kind: Resource
+    name: ocm-hello-world-pod-info-file-system-tar
+  helmReleaseTemplate:
+    chart: 
+      spec: 
+        chart: "podinfo"
+        interval: 10s
+        sourceRef:
+          apiVersion: delivery.ocm.software/v1alpha1
+          kind: Resource
+          name: ocm-hello-world-pod-info-file-system-tar
+    values:
+      replicaCount: 2
+      image:
+        repository: ghcr.io/stb1337/ocm-hello-world/stefanprodan/podinfo
+      ui:
+        color: "#FFC0CB" #8F00FF
+        message: "Hello from local .tar file Helm Chart"
+      ingress:
+        enabled: true
+        #className: ""
+        additionalLabels: {}
+        annotations:
+          nginx.ingress.kubernetes.io/backend-protocol: HTTP
+          dns.gardener.cloud/class: garden
+          dns.gardener.cloud/dnsnames: '*.ocm-hello-world.ketos.shoot.canary.k8s-hana.ondemand.com'
+          dns.gardener.cloud/ttl: '600'
+          # kubernetes.io/ingress.class: nginx
+          # kubernetes.io/tls-acme: "true"
+        hosts:
+          - host: podinfo-local-tar.ocm-hello-world.ketos.shoot.canary.k8s-hana.ondemand.com        
+            paths:
+              - path: /
+                pathType: Prefix
+        tls: 
+          - hosts:
+            - podinfo-local-tar.ocm-hello-world.ketos.shoot.canary.k8s-hana.ondemand.com        
+    interval: 10s
+    releaseName: "pod-info-file-system-tar"
+    targetNamespace: default    
+---
+# resource.yaml
+apiVersion: delivery.ocm.software/v1alpha1
+kind: Resource
+metadata:
+  name: ocm-hello-world-pod-info-image
+  namespace: ocm-system
+spec:
+  interval: 10s
+  sourceRef:
+    apiVersion: delivery.ocm.software/v1alpha1
+    kind: ComponentVersion
+    name: ocm-hello-world-pod-info
+    namespace: ocm-system
+    resourceRef:
+      name: pod-info-image
+      version: "6.6.4"     

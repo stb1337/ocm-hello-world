@@ -1,0 +1,74 @@
+components:
+- name: ${COMPONENT_NAME_PREFIX}/${NAME}
+  version: ${VERSION}
+  labels:
+  - name: "org.opencontainers.image.source"
+    value: "https://github.com/stb1337/ocm-hello-world"  
+  provider:
+    name: ${PROVIDER}
+  componentReferences:
+  - name: nginx-controller
+    componentName: ${COMPONENT_NAME_PREFIX}/nginx-controller
+    version: ${NGINX_VERSION}
+  - name: pod-info
+    componentName: ${COMPONENT_NAME_PREFIX}/pod-info
+    version: &version "6.6.4"
+# Nginx-Controller Component
+- name: ${COMPONENT_NAME_PREFIX}/nginx-controller
+  version: ${NGINX_VERSION}
+  provider:
+    name: ${PROVIDER}
+  labels:
+  - name: "org.opencontainers.image.source"
+    value: "https://github.com/stb1337/ocm-hello-world"
+  resources:
+  - name: nginx-external-helm-chart
+    type: helmChart
+    version: ${NGINX_VERSION}
+    relation: external
+    access:
+      type: helm
+      helmChart: ingress-nginx:4.10.0
+      helmRepository: https://kubernetes.github.io/ingress-nginx
+  - name: nginx-file-system-tgz 
+    type: fileSystem
+    version: ${NGINX_VERSION}
+    relation: local
+    input:      
+      type: helm
+      path: ingress-nginx-4.10.0.tar 
+  # - name: nginx-controller-image
+  #   type: ociImage
+  #   version: ${NGINX_VERSION}
+  #   access:
+  #     type: ociArtifact
+  #     imageReference: registry.k8s.io/ingress-nginx/controller:v${NGINX_VERSION}
+- name: ${COMPONENT_NAME_PREFIX}/pod-info
+  labels:
+  - name: "org.opencontainers.image.source"
+    value: "https://github.com/stb1337/ocm-hello-world"  
+  version: *version
+  provider:
+    name: ${PROVIDER}
+  resources:
+  - name: pod-info-external-helm-chart
+    type: helmChart
+    version: *version
+    relation: external
+    access:
+      type: helm
+      helmChart: podinfo:6.6.0
+      helmRepository: https://stefanprodan.github.io/podinfo
+  - name: pod-info-file-system-tar
+    type: helmChart
+    version: *version
+    #relation: local
+    input:      
+      type: helm
+      path: podinfo-6.6.0.tar
+  - name: pod-info-image
+    type: ociImage
+    version: *version
+    access:
+      type: ociArtifact
+      imageReference: ghcr.io/stefanprodan/podinfo:6.6.0
