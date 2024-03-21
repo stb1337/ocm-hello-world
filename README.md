@@ -5,9 +5,27 @@ OCM Hello World consisting of nginx + podinfo
 - Create a kind cluster: `kind create cluster`
 - Make sure flux is installed in your cluster using: `flux install`
 - Install the controller using: `ocm controller install`
-- `kubectl expose deployment registry -n ocm-system --type=LoadBalancer --name=ocm-system-load-balancer`
-- `kubectl expose deployment/registry -n ocm-system --type="NodePort" --port 5000 --name=ocm-system-node-port`
+
 ## Steps following 
+Flags:
+      --addenv                 access environment for templating
+  -C, --complete               include all referenced component version
+  -L, --copy-local-resources   transfer referenced local resources by-value
+  -V, --copy-resources         transfer referenced resources by-value
+  -c, --create                 (re)create archive
+      --dry-run                evaluate and print component specifications
+  -F, --file string            target file/directory (default "transport-archive")
+  -f, --force                  remove existing content
+  -h, --help                   help for componentversions
+      --lookup stringArray     repository name or spec for closure lookup fallback
+  -O, --output string          output file for dry-run
+  -S, --scheme string          schema version (default "v2")
+  -s, --settings stringArray   settings file with variable settings (yaml)
+      --templater string       templater to use (go, none, spiff, subst) (default "subst")
+  -t, --type string            archive format (directory, tar, tgz) (default "directory")
+  -v, --version string         default version for components
+
+
 *https://ocm.software/docs/guides/structuring-software-with-ocm/*
 
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
@@ -78,3 +96,5 @@ kubectl create secret docker-registry pull-secret -n ocm-system \
 #
 
 https://github.com/open-component-model/ocm-website/blob/main/content/en/docs/guides/complex-component-structure-deployment.md#common-issues
+
+https://github.com/open-component-model/demo-secure-delivery/blob/main/00-setup-demo/weave-gitops/src/ocm-ctrl/config.yaml

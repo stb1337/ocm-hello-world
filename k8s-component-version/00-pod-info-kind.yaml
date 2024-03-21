@@ -9,9 +9,7 @@ spec:
   references:
     expand: true
   repository:
-    url: ghcr.io/stb1337/ocm-hello-world
-    #secretRef:
-    #  name: pull-secret
+    url: ghcr.io/stb1337/ocm-hello-world-2   
   version:
     semver: "6.6.0"
 ---
@@ -31,7 +29,7 @@ spec:
       name: helm-chart-external
       version: "6.6.0"
       extraIdentity:
-        helmChart: podinfo # name of the chart
+        helmChart: podinfo
 ---
 apiVersion: delivery.ocm.software/v1alpha1
 kind: FluxDeployer
@@ -56,25 +54,10 @@ spec:
         - name: pull-secret
       replicaCount: 3
       image:
-        repository: ghcr.io/stb1337/ocm-hello-world/stefanprodan/podinfo #ghcr.io/stb1337/ocm-hello-world/ocm.software/podinfo/podinfo
+        repository: ghcr.io/stb1337/ocm-hello-world-2/stefanprodan/podinfo
       ui:
         color: "#8F00FF"
-        message: "Hello from remote referenced Helm Chart"
-      ingress:
-        enabled: true        
-        annotations:
-          nginx.ingress.kubernetes.io/backend-protocol: HTTP
-          dns.gardener.cloud/class: garden
-          dns.gardener.cloud/dnsnames: '*.ocm-hello-world.ketos.shoot.canary.k8s-hana.ondemand.com'
-          dns.gardener.cloud/ttl: '600'
-        hosts:
-          - host: podinfo-remote-ref.ocm-hello-world.ketos.shoot.canary.k8s-hana.ondemand.com        
-            paths:
-              - path: /
-                pathType: Prefix
-        tls: 
-          - hosts:
-            - podinfo-remote-ref.ocm-hello-world.ketos.shoot.canary.k8s-hana.ondemand.com
+        message: "Hello from remote referenced Helm Chart"      
     interval: 10s
     releaseName: "podinfo-helm-chart-external"
     targetNamespace: default
@@ -97,7 +80,6 @@ spec:
       extraIdentity:
         helmChart: podinfo # name of the chart
 ---
-# deployer.yaml
 apiVersion: delivery.ocm.software/v1alpha1
 kind: FluxDeployer
 metadata:
@@ -117,30 +99,14 @@ spec:
     values:
       replicaCount: 2
       image:
-        repository: ghcr.io/stb1337/ocm-hello-world/stefanprodan/podinfo #ghcr.io/stb1337/ocm-hello-world/ocm.software/podinfo/podinfo
+        repository: ghcr.io/stb1337/ocm-hello-world-2/stefanprodan/podinfo
       ui:
-        color: "#FFC0CB" #8F00FF
-        message: "Hello from local .tar file Helm Chart"
-      ingress:
-        enabled: true        
-        annotations:
-          nginx.ingress.kubernetes.io/backend-protocol: HTTP
-          dns.gardener.cloud/class: garden
-          dns.gardener.cloud/dnsnames: '*.ocm-hello-world.ketos.shoot.canary.k8s-hana.ondemand.com'
-          dns.gardener.cloud/ttl: '600'          
-        hosts:
-          - host: podinfo-local-tar.ocm-hello-world.ketos.shoot.canary.k8s-hana.ondemand.com        
-            paths:
-              - path: /
-                pathType: Prefix
-        tls: 
-          - hosts:
-            - podinfo-local-tar.ocm-hello-world.ketos.shoot.canary.k8s-hana.ondemand.com        
+        color: "#FFC0CB"
+        message: "Hello from local .tar file Helm Chart"        
     interval: 10s
     releaseName: "podinfo-helm-chart-local-tgz"
     targetNamespace: default    
 ---
-# resource.yaml
 apiVersion: delivery.ocm.software/v1alpha1
 kind: Resource
 metadata:
@@ -155,4 +121,4 @@ spec:
     namespace: ocm-system
     resourceRef:
       name: image
-      version: "6.6.0"     
+      version: "6.6.0"
