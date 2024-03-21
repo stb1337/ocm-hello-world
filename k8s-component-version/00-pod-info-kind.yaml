@@ -47,11 +47,7 @@ spec:
       spec: 
         chart: "podinfo"
         interval: 10s
-    values:
-      serviceAccount:
-        enabled: True
-        imagePullSecrets:
-        - name: pull-secret
+    values:      
       replicaCount: 3
       image:
         repository: ghcr.io/stb1337/ocm-hello-world-2/stefanprodan/podinfo
