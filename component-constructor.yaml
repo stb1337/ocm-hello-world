@@ -3,7 +3,7 @@ components:
 - name: ${COMPONENT_NAME_PREFIX}/podinfo
   labels:
   - name: "org.opencontainers.image.source"
-    value: "https://github.com/stb1337/ocm-hello-world"  
+    value: "https://github.com/stb1337/ocm-hello-world-v1"  
   version: ${PODINFO_VERSION}
   provider:
     name: ${PROVIDER}

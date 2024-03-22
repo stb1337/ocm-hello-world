@@ -9,7 +9,9 @@ spec:
   references:
     expand: true
   repository:
-    url: ghcr.io/stb1337/ocm-hello-world-2   
+    url: ghcr.io/stb1337/ocm-hello-world-v1
+    secretRef:
+      name: ghcr-pull-secret
   version:
     semver: "6.6.0"
 ---
@@ -50,10 +52,15 @@ spec:
     values:      
       replicaCount: 3
       image:
-        repository: ghcr.io/stb1337/ocm-hello-world-2/stefanprodan/podinfo
+        repository: ghcr.io/stb1337/ocm-hello-world-v1/stefanprodan/podinfo
       ui:
         color: "#8F00FF"
         message: "Hello from remote referenced Helm Chart"      
+      serviceAccount:        
+        enabled: true        
+        name: "sa-podinfo-ghcr-io-1"
+        imagePullSecrets:
+        - name: pull-secret
     interval: 10s
     releaseName: "podinfo-helm-chart-external"
     targetNamespace: default
@@ -95,10 +102,15 @@ spec:
     values:
       replicaCount: 2
       image:
-        repository: ghcr.io/stb1337/ocm-hello-world-2/stefanprodan/podinfo
+        repository: ghcr.io/stb1337/ocm-hello-world-v1/stefanprodan/podinfo
       ui:
         color: "#FFC0CB"
         message: "Hello from local .tar file Helm Chart"        
+      serviceAccount:        
+        enabled: true        
+        name: "sa-podinfo-ghcr-io-2"
+        imagePullSecrets:
+        - name: pull-secret
     interval: 10s
     releaseName: "podinfo-helm-chart-local-tgz"
     targetNamespace: default    
